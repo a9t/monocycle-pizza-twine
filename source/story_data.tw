@@ -1,0 +1,74 @@
+:: StoryData
+{
+	"ifid": "D674C58C-DEFA-4F70-B7A2-27742230CA2B",
+	"format": "SugarCube",
+	"format-version": "2.30.0",
+	"start": "Let's start"
+}
+
+:: StoryTitle
+Monocycle Pizza
+
+:: StoryInit
+<<set $morale to 50>>
+<<set $money to 100>>
+<<set $dice_base_line = []>>
+<<run $dice_base_line.push([["A", 1], ["A", 1], ["B", 1], ["C", 1], ["D", 1], [" ", 0]])>>
+<<run $dice_base_line.push([["A", 1], ["B", 1], ["B", 1], ["C", 1], ["D", 1], [" ", 0]])>>
+<<run $dice_base_line.push([["A", 1], ["B", 1], ["C", 1], ["C", 1], ["D", 1], [" ", 0]])>>
+<<run $dice_base_line.push([["A", 1], ["B", 1], ["C", 1], ["D", 1], ["D", 1], [" ", 0]])>>
+<<set $last_rounds to 10>>
+
+
+:: StoryCaption
+Money: $money
+Morale: $morale
+
+<<for _i, _die range $dice_base_line>>
+    <<set _faces to []>> \
+    <<for _j, _face range _die>> \
+      <<if _face[1] === 0>> \
+        <<run _faces.push("0") >> \
+      <<else>> \
+        <<set _msg = _face[0]+_face[1]>> \
+        <<run _faces.push(_msg) >> \
+      <</if>> \
+    <</for>> \
+		Die _i: <<= _faces.join("-")>>
+<</for>>
+
+:: Let's start
+<<set $rounds to $last_rounds>>
+<<run $last_rounds += 1>>
+[[Begin the challenge|Challenge]]
+
+:: Challenge
+<<run $rounds-->>
+<<if $rounds == 0>>
+  It is done. [[Go back|Let's start]]
+<<else>>
+  <<silently>>
+    <<set _tartget_type = either(["A", "B", "C", "D"])>>
+    <<set _target_count = random(1, 3)>>
+  <</silently>>
+  Rounds remaining: $rounds
+  Challenge: <<print _target_count>><<print _tartget_type>> \
+
+  <<linkappend "Roll the dice">>
+    <<set _acc = 0>> \
+    <<set _msg = "">> \
+    <<for _i, _die range $dice_base_line>> \
+      <<run _face = _die[random(5)]>> \
+      <<run _msg += _face[1] + _face[0] + " ">> \
+      <<if _face[0] == _tartget_type>> \
+        <<run _acc+=_face[1]>> \
+      <</if>> \
+    <</for>>
+    You rolled: _msg \
+    <<if _acc >= _target_count >>
+      You win the round; [[Next round|Challenge]]
+    <<else>>
+      You lose the round; [[Next round|Challenge]]
+    <</if>>
+  <</linkappend>>
+<</if>>
