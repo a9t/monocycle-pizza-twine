@@ -68,7 +68,10 @@ Morale: $morale
     <<if _acc >= _target_count >>
       You win the round; [[Next round|Challenge][$morale++]]
     <<else>>
-      You lose the round; [[Next round|Challenge][$morale-=2]]
+      You lose the round; <<run $morale-=2>><<if $morale > 0>>[[Next round|Challenge]]<<else>>[[You can no longer fight|End game]]<</if>>
     <</if>>
   <</linkappend>>
 <</if>>
+
+:: End game
+Game Over
