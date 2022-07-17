@@ -66,9 +66,9 @@ Morale: $morale
     <</for>>
     You rolled: _msg \
     <<if _acc >= _target_count >>
-      You win the round; [[Next round|Challenge]]
+      You win the round; [[Next round|Challenge][$morale++]]
     <<else>>
-      You lose the round; [[Next round|Challenge]]
+      You lose the round; [[Next round|Challenge][$morale-=2]]
     <</if>>
   <</linkappend>>
 <</if>>
