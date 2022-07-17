@@ -146,9 +146,9 @@ Morale: $morale
     &lt;&lt;/for&gt;&gt;
     You rolled: _msg \
     &lt;&lt;if _acc &gt;= _target_count &gt;&gt;
-      You win the round; [[Next round|Challenge][$morale++]]
+      You win the round; [[next round|Challenge][$morale++]]
     &lt;&lt;else&gt;&gt;
-      You lose the round; &lt;&lt;run $morale-=2&gt;&gt;&lt;&lt;if $morale &gt; 0&gt;&gt;[[Next round|Challenge]]&lt;&lt;else&gt;&gt;[[You can no longer fight|End game]]&lt;&lt;/if&gt;&gt;
+      You lose the round; &lt;&lt;run $morale-=2&gt;&gt;&lt;&lt;if $morale &gt; 0&gt;&gt;[[next round|Challenge]]&lt;&lt;else&gt;&gt;[[You can no longer fight|End game]]&lt;&lt;/if&gt;&gt;
     &lt;&lt;/if&gt;&gt;
   &lt;&lt;/linkappend&gt;&gt;
 &lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="5" name="End game" tags="" position="600,100" size="100,100">Game Over</tw-passagedata></tw-storydata>
