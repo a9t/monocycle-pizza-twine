@@ -22,6 +22,7 @@ jobs:
           unzip tweego.zip -d tweego
           chmod u+x tweego/tweego
           export PATH=$PATH:`pwd`/tweego
+          mkdir dist
           tweego source -o dist/index.html
 
       - name: Deploy to Pages
