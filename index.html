@@ -133,7 +133,7 @@ Morale: $morale
     &lt;&lt;/for&gt;&gt; \
 		Die _i: &lt;&lt;= _faces.join(&quot;-&quot;)&gt;&gt;
 &lt;&lt;/for&gt;&gt;</tw-passagedata><tw-passagedata pid="3" name="Let&#39;s start" tags="" position="350,100" size="100,100">Welcome!
-[[Let&#39;s start|Encounter preparation]]</tw-passagedata><tw-passagedata pid="4" name="Encounter preparation" tags="" position="475,100" size="100,100">&lt;&lt;set $rounds to $last_rounds&gt;&gt;
+[[Let&#39;s start|Pre-encounter]]</tw-passagedata><tw-passagedata pid="4" name="Pre-encounter" tags="" position="475,100" size="100,100">&lt;&lt;set $rounds to $last_rounds&gt;&gt;
 &lt;&lt;run $challenge_count++&gt;&gt;
 &lt;&lt;run $last_rounds++&gt;&gt;
 &lt;&lt;set $crt_enemy = either([&quot;punk&quot;, &quot;man&quot;, &quot;lady&quot;, &quot;cop&quot;])&gt;&gt;
@@ -146,7 +146,7 @@ Encounter $challenge_count with a $crt_enemy will have &lt;&lt;print $rounds-1&g
       &lt;&lt;set $morale = 100&gt;&gt;
     &lt;&lt;/if&gt;&gt;
   &lt;&lt;/silently&gt;&gt;
-  Challenge is over. [[Go back to the streets|Encounter preparation]]
+  Challenge is over. [[Go back to the streets|Pre-encounter]]
 &lt;&lt;else&gt;&gt;
   &lt;&lt;silently&gt;&gt;
     &lt;&lt;set _tartget_type = either($enemy[$crt_enemy][&quot;bias&quot;])&gt;&gt;
