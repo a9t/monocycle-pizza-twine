@@ -133,9 +133,12 @@ The die enhancement will cost you $dice_enhancement_cost morale.
 
   <<linkappend "Roll the dice">>
     <<set _acc = 0>> \
+    <<set _rolled_face = []>> \
     <<set _msg = "">> \
     <<for _i, _die range $dice_base_line>> \
-      <<run _face = _die[random(5)]>> \
+      <<set _face_index = random(5)>> \
+      <<set _face = _die[_face_index]>> \
+      <<run _rolled_face.push(_face_index)>> \
       <<run _msg += _face[1] + _face[0] + " ">> \
       <<if _face[0] == _tartget_type>> \
         <<run _acc+=_face[1]>> \
@@ -145,7 +148,34 @@ The die enhancement will cost you $dice_enhancement_cost morale.
     <<if _acc >= _target_count >>
       You win the round; <<run $morale++>><<if $morale > 100>><<set $morale = 100>><</if>>[[next round|Challenge]]
     <<else>>
-      You lose the round; <<run $morale-=2>><<if $morale > 0>>[[next round|Challenge]]<<else>>[[You can no longer fight|End game]]<</if>>
+      <<set _to_roll = [false, false, false, false]>> \
+      Losing roll; select dice to reroll.
+      <<for _i to 0; _i lt 4; _i++>> \
+        <<capture _i>> \
+          <<checkbox `"_to_roll[_i]"` false true autocheck>> Roll die <<print _i+1>>
+        <</capture>> \
+      <</for>> \
+      <<linkappend "Reroll the dice">> \
+        <<set _msg = "">> \
+        <<set _acc = 0>> \
+        <<for _i, _die range $dice_base_line>> \
+          <<if _to_roll[_i]>> \
+            <<set _face = _die[random(5)]>> \
+          <<else>> \
+            <<set _face = _die[_rolled_face[_i]]>> \
+          <</if>> \
+          <<run _msg += _face[1] + _face[0] + " ">> \
+          <<if _face[0] == _tartget_type>> \
+            <<run _acc+=_face[1]>> \
+          <</if>> \
+        <</for>> \
+        Your new roll is: _msg
+      <</linkappend>> \
+      <<if _acc >= _target_count >>
+        You win the round; <<run $morale++>><<if $morale > 100>><<set $morale = 100>><</if>>[[next round|Challenge]]
+      <<else>>
+        You lose the round; <<run $morale-=2>><<if $morale > 0>>[[next round|Challenge]]<<else>>[[You can no longer fight|End game]]<</if>>
+      <</if>>
     <</if>>
   <</linkappend>>
 <</if>>
