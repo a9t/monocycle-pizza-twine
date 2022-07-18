@@ -6,8 +6,10 @@
 	"start": "Let's start"
 }
 
+
 :: StoryTitle
 Monocycle Pizza
+
 
 :: StoryInit
 <<set $morale to 50>>
@@ -48,17 +50,20 @@ Morale: $morale
 		Die _i: <<= _faces.join("-")>>
 <</for>>
 
+
 :: Let's start
 Welcome!
-[[Let's start|Encounter preparation]]
+[[Let's start|Pre-encounter]]
 
-:: Encounter preparation
+
+:: Pre-encounter
 <<set $rounds to $last_rounds>>
 <<run $challenge_count++>>
 <<run $last_rounds++>>
 <<set $crt_enemy = either(["punk", "man", "lady", "cop"])>>
 Encounter $challenge_count with a $crt_enemy will have <<print $rounds-1>> rounds
 [[Begin the challenge|Challenge]]
+
 
 :: Challenge
 <<run $rounds-->>
@@ -69,7 +74,7 @@ Encounter $challenge_count with a $crt_enemy will have <<print $rounds-1>> round
       <<set $morale = 100>>
     <</if>>
   <</silently>>
-  Challenge is over. [[Go back to the streets|Encounter preparation]]
+  Challenge is over. [[Go back to the streets|Pre-encounter]]
 <<else>>
   <<silently>>
     <<set _tartget_type = either($enemy[$crt_enemy]["bias"])>>
@@ -102,6 +107,7 @@ Encounter $challenge_count with a $crt_enemy will have <<print $rounds-1>> round
     <</if>>
   <</linkappend>>
 <</if>>
+
 
 :: End game
 Game Over
