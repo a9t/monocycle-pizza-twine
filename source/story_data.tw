@@ -37,6 +37,8 @@ Monocycle Pizza
 <<set $dice_enhancement_cost to 4>>
 <<set $dice_enhanced to false>>
 
+<<set $tv_working to true>>
+
 
 :: StoryCaption
 Money: $money
@@ -58,4 +60,4 @@ Morale: $morale
 
 :: Start
 Welcome to Monocycle Pizza!
-[[Start your adventure|Let's start]].
+[[Investigate your room|Home room]].

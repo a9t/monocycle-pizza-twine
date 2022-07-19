@@ -1,5 +1,3 @@
-
-
 :: Let's start
 <<silently>>
   <<set $dice_enhanced to false>>

@@ -1,0 +1,58 @@
+:: Home room
+[[Browse the internet]]
+[[Watch TV]]
+[[Go out|Let's start]]
+
+
+:: Browse the internet
+There is so much here. I don't know where to start.
+[[Home room]]
+
+
+:: Watch TV
+<<if $tv_working>> \
+  This thing is depressing, but maybe there is something here. [[I need to keep watching.|Watch TV - part 2]]
+  [[Turn off TV|Home room]]
+<<else>> \
+  Strange that this TV I broke is still broken.
+  [[I should do something else|Home room]]
+<</if>>
+
+
+:: Watch TV - part 2
+<<set $morale-=2>> \
+<<if $morale <= 0>>> \
+  TV really is bad for you.
+  Game Over.
+<<else>>
+  Maybe the worst part of this is over. [[I should continue.|Watch TV - part 3]]
+  [[OK, that's enough|Home room]]
+<</if>>
+
+
+:: Watch TV - part 3
+<<set $morale-=3>> \
+<<if $morale <= 0>>> \
+  You should have stopped a few hours ago. Now it's too late.
+  Game Over.
+<<else>>
+  I feel physically ill. [[But I have to keep watching.|Watch TV - part 4]]
+  [[Need to stop or I'll throw up|Home room]]
+  [[Smash this venom spewing machine|Smashed TV][$tv_working=false]]
+<</if>>
+
+
+:: Watch TV - part 4
+<<set $morale-=5>> \
+<<if $morale <= 0>>> \
+  You ingested so much garbage that you destroyed yourself.
+  Game Over.
+<<else>>
+  When did I fall asleep? [[No more TV for me|Home room]]
+<</if>>
+
+
+:: Smashed TV
+The TV told me that when it dies there's smoke coming out of it.
+I guess that's another thing it lied about.
+[[Home room]]
