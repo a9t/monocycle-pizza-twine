@@ -262,7 +262,13 @@ I guess that&#39;s another thing it lied about.
 &lt;&lt;set $dice_enhancement_cost to 4&gt;&gt;
 &lt;&lt;set $dice_enhanced to false&gt;&gt;
 
-&lt;&lt;set $tv_working to true&gt;&gt;</tw-passagedata><tw-passagedata pid="15" name="StoryCaption" tags="" position="600,225" size="100,100">Money: $money
+&lt;&lt;set $tv_working to true&gt;&gt;
+
+&lt;&lt;set $riders=[]&gt;&gt;
+&lt;&lt;run $riders.push({&quot;name&quot;: &quot;oV&quot;, &quot;capacity&quot;: 2, &quot;speed&quot;: 20})&gt;&gt;
+&lt;&lt;run $riders.push({&quot;name&quot;: &quot;uC&quot;, &quot;capacity&quot;: 10, &quot;speed&quot;: 8})&gt;&gt;
+&lt;&lt;run $riders.push({&quot;name&quot;: &quot;iZ&quot;, &quot;capacity&quot;: 4, &quot;speed&quot;: 14})&gt;&gt;
+&lt;&lt;run $riders.push({&quot;name&quot;: &quot;eS&quot;, &quot;capacity&quot;: 5, &quot;speed&quot;: 13})&gt;&gt;</tw-passagedata><tw-passagedata pid="15" name="StoryCaption" tags="" position="600,225" size="100,100">Money: $money
 Morale: $morale
 
 &lt;&lt;for _i, _die range $dice_base_line&gt;&gt;
@@ -276,6 +282,11 @@ Morale: $morale
       &lt;&lt;/if&gt;&gt; \
     &lt;&lt;/for&gt;&gt; \
 		Die &lt;&lt;print (_i+1)&gt;&gt;: &lt;&lt;= _faces.join(&quot;-&quot;)&gt;&gt;
+&lt;&lt;/for&gt;&gt;
+
+Riders
+&lt;&lt;for _i, _rider range $riders&gt;&gt;
+    _rider[&quot;name&quot;]: carry - _rider[&quot;capacity&quot;], speed - _rider[&quot;speed&quot;]
 &lt;&lt;/for&gt;&gt;</tw-passagedata><tw-passagedata pid="16" name="Start" tags="" position="725,225" size="100,100">Welcome to Monocycle Pizza!
 [[Investigate your room|Home room]].</tw-passagedata></tw-storydata>
 	<script id="script-sugarcube" type="text/javascript">
