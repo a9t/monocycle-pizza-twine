@@ -39,6 +39,12 @@ Monocycle Pizza
 
 <<set $tv_working to true>>
 
+<<set $riders=[]>>
+<<run $riders.push({"name": "oV", "capacity": 2, "speed": 20})>>
+<<run $riders.push({"name": "uC", "capacity": 10, "speed": 8})>>
+<<run $riders.push({"name": "iZ", "capacity": 4, "speed": 14})>>
+<<run $riders.push({"name": "eS", "capacity": 5, "speed": 13})>>
+
 
 :: StoryCaption
 Money: $money
@@ -55,6 +61,11 @@ Morale: $morale
       <</if>> \
     <</for>> \
 		Die <<print (_i+1)>>: <<= _faces.join("-")>>
+<</for>>
+
+Riders
+<<for _i, _rider range $riders>>
+    _rider["name"]: carry - _rider["capacity"], speed - _rider["speed"]
 <</for>>
 
 
