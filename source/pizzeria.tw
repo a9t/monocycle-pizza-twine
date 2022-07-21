@@ -1,0 +1,87 @@
+:: Pizzeria main
+Let the work day begin!
+/* [[Assign order|Select rider]] */
+[[Wait for event|Pizzeria event]]
+[[Show orders]]
+[[Give up|Home room]]
+
+
+:: Pizzeria event
+<<set _mins_till_next_order = random(1, 30)>> \
+<<set $next_order_mins = $time_mins + _mins_till_next_order>> \
+
+<<if $time_mins/60 >= 16>>
+  <<set $orders=[]>>
+  [[Time to go home|Home room]]
+<<elseif $orders.length == 0 or $orders[0]["time"] >= $next_order_mins>> \
+  <<set _start_min = $next_order_mins + 30>> \
+  <<set _distance = either([2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 9])>> \
+  <<set _pizza_count = either([1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8])>> \
+  <<set $candidate_order = {"distance": _distance, "pizzas": _pizza_count, "time": _start_min, "status": "unassigned", "rider": "-"}>> \
+   
+  There is a new order for _pizza_count <<if _pizza_count == 1>>pizza<<else>>pizzas<</if>> at distance _distance and time _start_min.
+  [[Accept order]]
+  [[Refuse order|Pizzeria main]]
+<<else>>
+  <<silently>> \
+    /* remove it for now, this needs to be decided based on status */
+    <<set _order = $orders.shift()>>
+    <<set $time_mins = _order["time"]>>
+  <</silently>> \
+  Order for <<print _order["pizzas"]>> at distace <<print _order["distance"]>> completed
+  <<return>>
+<</if>>
+
+
+:: Accept order
+<<silently>>
+  <<set $time_mins = $next_order_mins>>
+  <<run $orders.push($candidate_order)>>
+  <<run $orders.sort((a, b) => {return a["time"] - b["time"]})>>
+<</silently>>
+Order has been inserted in queue.
+[[Back|Pizzeria main]]
+
+
+:: Show orders
+<<for _i, _order range $orders>> \
+  <<silently>> \
+    <<set _mins_ref = _order["time"] % 60>>
+    <<set _hours_ref = Math.floor(_order["time"] / 60)>>
+    <<set _disp_hours = "" + _hours_ref>>
+    <<if _hours_ref < 10>>
+      <<set _disp_hours = "0" + _hours_ref>>
+    <</if>>
+    <<set _disp_mins = "" + _mins_ref>>
+    <<if _mins_ref < 10>>
+      <<set _disp_mins = "0" + _mins_ref>>
+    <</if>>
+  <</silently>> \
+  <<capture _order, _disp_hours, _disp_mins>> \
+    Order for <<print _order["pizzas"]>> at distace <<print _order["distance"]>>
+    ..status <<print _order["status"]>>
+    ..<<if _order["status"] == "unassigned">>ready at _disp_hours:_disp_mins<<else>>rider back at _disp_hours:_disp_mins<</if>>
+    <<if _order["rider"] != "-">>..rider <<print _order["rider"]>><</if>>
+  <</capture>> \
+<</for>>
+
+<<return>>
+
+
+:: Select rider
+// Display riders - move to orders
+
+
+:: Select orders
+// Display orders
+
+
+:: Assignment succeeded
+// Assignment of rider to order succeeded
+
+
+
+:: Assignment failed
+// Could not reassign due to collision with another assignment - mention assignment
+// back to select orders
+// back to wait

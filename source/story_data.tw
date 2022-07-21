@@ -45,8 +45,26 @@ Monocycle Pizza
 <<run $riders.push({"name": "iZ", "capacity": 4, "speed": 14})>>
 <<run $riders.push({"name": "eS", "capacity": 5, "speed": 13})>>
 
+<<set $orders=[]>>
+
+<<set $time_mins=480>>
+
 
 :: StoryCaption
+<<silently>>
+  <<set _mins_ref = $time_mins % 60>>
+  <<set _hours_ref = Math.floor($time_mins / 60)>>
+  <<set _disp_hours = "" + _hours_ref>>
+  <<if _hours_ref < 10>>
+    <<set _disp_hours = "0" + _hours_ref>>
+  <</if>>
+  <<set _disp_mins = "" + _mins_ref>>
+  <<if _mins_ref < 10>>
+    <<set _disp_mins = "0" + _mins_ref>>
+  <</if>>
+<</silently>>
+Time: _disp_hours:_disp_mins
+
 Money: $money
 Morale: $morale
 
