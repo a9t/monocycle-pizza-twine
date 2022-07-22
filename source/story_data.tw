@@ -46,6 +46,7 @@ Monocycle Pizza
 <<run $riders.push({"name": "eS", "capacity": 5, "speed": 13})>>
 
 <<set $orders=[]>>
+<<set $orderByRiderName={}>>
 
 <<set $time_mins=480>>
 

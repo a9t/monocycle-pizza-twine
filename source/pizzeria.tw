@@ -1,6 +1,6 @@
 :: Pizzeria main
 Let the work day begin!
-/* [[Assign order|Select rider]] */
+[[Assign order|Select rider]]
 [[Wait for event|Pizzeria event]]
 [[Show orders]]
 [[Give up|Home room]]
@@ -11,7 +11,10 @@ Let the work day begin!
 <<set $next_order_mins = $time_mins + _mins_till_next_order>> \
 
 <<if $time_mins/60 >= 16>>
-  <<set $orders=[]>>
+  <<silently>>
+    <<set $orders=[]>> 
+    <<set $orderByRiderName={}>>
+  <</silently>>
   [[Time to go home|Home room]]
 <<elseif $orders.length == 0 or $orders[0]["time"] >= $next_order_mins>> \
   <<set $time_mins = $next_order_mins>> \
@@ -62,7 +65,7 @@ Order has been inserted in queue.
     <<else>>
       ..delivery failed at _disp_time
     <</if>> \
-    <<if _order["rider"] === null>>..no rider assigned<<else>>..rider <<print _order["rider"]>><</if>>
+    <<if _order["rider"] === null>>..no rider assigned<<else>>..rider <<print _order["rider"]["name"]>><</if>>
   <</capture>> \
 <</for>>
 
@@ -70,15 +73,61 @@ Order has been inserted in queue.
 
 
 :: Select rider
-// Display riders - move to orders
+<<for _i, _rider range $riders>> \
+  <<set _riderName = _rider["name"]>> \
+  <<set _order = $orderByRiderName[_rider["name"]]>> \
+  <<set _message = "Assign rider " + _riderName>> \
+  <<capture _i, _message>> \
+    <<if _order == null or _order["status"] != "idle">> \
+      [[_message|Select order][$selectedRiderIndex=_i]]
+    <</if>> \
+  <</capture>> \
+<</for>>\
+
+[[Back|Pizzeria main]]
 
 
-:: Select orders
-// Display orders
+:: Select order
+<<set _selectedRider = $riders[$selectedRiderIndex]>> \
+<<print "Assign rider " + _selectedRider["name"]>>
+<<for _i, _order range $orders>> \
+  <<silently>> \
+    <<if _selectedRider["capacity"] < _order["pizzas"]>> \
+      <<continue>> \
+    <</if>> \
+    <<set _disp_time = setup.minsToClock(_order["time"])>> \
+  <</silently>> \
+  <<capture _i, _order, _disp_time>> \
+    <<if $orders[_i]["status"] == "waiting">> \
+      [[Select|Assignment succeeded][$selectedOrderIndex=_i]] Order for <<print $orders[_i]["pizzas"]>> pizza(s) waiting till _disp_time
+    <<elseif order["status"] == "idle">> \
+      [[Select|Assignment succeeded][$selectedOrderIndex=_i]] Order for <<print $orders[_i]["pizzas"]>> pizza(s) idle till _disp_time assigned to <<print $orders[_i]["rider"]["name"]>>
+    <</if>> \
+  <</capture>> \
+<</for>>
+
+[[Back to riders|Select rider]]
 
 
 :: Assignment succeeded
-// Assignment of rider to order succeeded
+<<set _selectedOrder = $orders[$selectedOrderIndex]>> \
+<<set _selectedRider = $riders[$selectedRiderIndex]>> \
+<<silently>>
+  <<if _selectedOrder["rider"] !== undefined and _selectedOrder["rider"] !== null>>
+    <<set $orderByRiderName[_selectedOrder["rider"]["name"]] = null>>
+  <</if>>
+
+  <<set _oldOrder = $orderByRiderName[_selectedRider["name"]]>>
+  <<if _oldOrder !== undefined and _oldOrder !== null>>
+    <<set _oldOrder["status"] = "waiting">>
+    <<set _oldOrder["rider"] = null>>
+  <</if>>
+
+  <<set _selectedOrder["rider"] = _selectedRider>>
+  <<set $orderByRiderName[_selectedRider["name"]] = _selectedOrder>>
+<</silently>>
+Order has been assigned to <<print _selectedRider["name"]>>
+[[Back to main view|Pizzeria main]]
 
 
 
