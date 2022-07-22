@@ -241,14 +241,17 @@ You are on the street, about to have a confrontation.
 &lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="13" name="Smashed TV" tags="" position="350,225" size="100,100">The TV told me that when it dies there&#39;s smoke coming out of it.
 I guess that&#39;s another thing it lied about.
 [[Home room]]</tw-passagedata><tw-passagedata pid="14" name="Pizzeria main" tags="" position="475,225" size="100,100">Let the work day begin!
-/* [[Assign order|Select rider]] */
+[[Assign order|Select rider]]
 [[Wait for event|Pizzeria event]]
 [[Show orders]]
 [[Give up|Home room]]</tw-passagedata><tw-passagedata pid="15" name="Pizzeria event" tags="" position="600,225" size="100,100">&lt;&lt;set _mins_till_next_order = random(1, 30)&gt;&gt; \
 &lt;&lt;set $next_order_mins = $time_mins + _mins_till_next_order&gt;&gt; \
 
 &lt;&lt;if $time_mins/60 &gt;= 16&gt;&gt;
-  &lt;&lt;set $orders=[]&gt;&gt;
+  &lt;&lt;silently&gt;&gt;
+    &lt;&lt;set $orders=[]&gt;&gt; 
+    &lt;&lt;set $orderByRiderName={}&gt;&gt;
+  &lt;&lt;/silently&gt;&gt;
   [[Time to go home|Home room]]
 &lt;&lt;elseif $orders.length == 0 or $orders[0][&quot;time&quot;] &gt;= $next_order_mins&gt;&gt; \
   &lt;&lt;set $time_mins = $next_order_mins&gt;&gt; \
@@ -291,11 +294,57 @@ Order has been inserted in queue.
     &lt;&lt;else&gt;&gt;
       ..delivery failed at _disp_time
     &lt;&lt;/if&gt;&gt; \
-    &lt;&lt;if _order[&quot;rider&quot;] === null&gt;&gt;..no rider assigned&lt;&lt;else&gt;&gt;..rider &lt;&lt;print _order[&quot;rider&quot;]&gt;&gt;&lt;&lt;/if&gt;&gt;
+    &lt;&lt;if _order[&quot;rider&quot;] === null&gt;&gt;..no rider assigned&lt;&lt;else&gt;&gt;..rider &lt;&lt;print _order[&quot;rider&quot;][&quot;name&quot;]&gt;&gt;&lt;&lt;/if&gt;&gt;
   &lt;&lt;/capture&gt;&gt; \
 &lt;&lt;/for&gt;&gt;
 
-&lt;&lt;return&gt;&gt;</tw-passagedata><tw-passagedata pid="18" name="Select rider" tags="" position="975,225" size="100,100">// Display riders - move to orders</tw-passagedata><tw-passagedata pid="19" name="Select orders" tags="" position="1100,225" size="100,100">// Display orders</tw-passagedata><tw-passagedata pid="20" name="Assignment succeeded" tags="" position="1225,225" size="100,100">// Assignment of rider to order succeeded</tw-passagedata><tw-passagedata pid="21" name="Assignment failed" tags="" position="100,350" size="100,100">// Could not reassign due to collision with another assignment - mention assignment
+&lt;&lt;return&gt;&gt;</tw-passagedata><tw-passagedata pid="18" name="Select rider" tags="" position="975,225" size="100,100">&lt;&lt;for _i, _rider range $riders&gt;&gt; \
+  &lt;&lt;set _riderName = _rider[&quot;name&quot;]&gt;&gt; \
+  &lt;&lt;set _order = $orderByRiderName[_rider[&quot;name&quot;]]&gt;&gt; \
+  &lt;&lt;set _message = &quot;Assign rider &quot; + _riderName&gt;&gt; \
+  &lt;&lt;capture _i, _message&gt;&gt; \
+    &lt;&lt;if _order == null or _order[&quot;status&quot;] != &quot;idle&quot;&gt;&gt; \
+      [[_message|Select order][$selectedRiderIndex=_i]]
+    &lt;&lt;/if&gt;&gt; \
+  &lt;&lt;/capture&gt;&gt; \
+&lt;&lt;/for&gt;&gt;\
+
+[[Back|Pizzeria main]]</tw-passagedata><tw-passagedata pid="19" name="Select order" tags="" position="1100,225" size="100,100">&lt;&lt;set _selectedRider = $riders[$selectedRiderIndex]&gt;&gt; \
+&lt;&lt;print &quot;Assign rider &quot; + _selectedRider[&quot;name&quot;]&gt;&gt;
+&lt;&lt;for _i, _order range $orders&gt;&gt; \
+  &lt;&lt;silently&gt;&gt; \
+    &lt;&lt;if _selectedRider[&quot;capacity&quot;] &lt; _order[&quot;pizzas&quot;]&gt;&gt; \
+      &lt;&lt;continue&gt;&gt; \
+    &lt;&lt;/if&gt;&gt; \
+    &lt;&lt;set _disp_time = setup.minsToClock(_order[&quot;time&quot;])&gt;&gt; \
+  &lt;&lt;/silently&gt;&gt; \
+  &lt;&lt;capture _i, _order, _disp_time&gt;&gt; \
+    &lt;&lt;if $orders[_i][&quot;status&quot;] == &quot;waiting&quot;&gt;&gt; \
+      [[Select|Assignment succeeded][$selectedOrderIndex=_i]] Order for &lt;&lt;print $orders[_i][&quot;pizzas&quot;]&gt;&gt; pizza(s) waiting till _disp_time
+    &lt;&lt;elseif order[&quot;status&quot;] == &quot;idle&quot;&gt;&gt; \
+      [[Select|Assignment succeeded][$selectedOrderIndex=_i]] Order for &lt;&lt;print $orders[_i][&quot;pizzas&quot;]&gt;&gt; pizza(s) idle till _disp_time assigned to &lt;&lt;print $orders[_i][&quot;rider&quot;][&quot;name&quot;]&gt;&gt;
+    &lt;&lt;/if&gt;&gt; \
+  &lt;&lt;/capture&gt;&gt; \
+&lt;&lt;/for&gt;&gt;
+
+[[Back to riders|Select rider]]</tw-passagedata><tw-passagedata pid="20" name="Assignment succeeded" tags="" position="1225,225" size="100,100">&lt;&lt;set _selectedOrder = $orders[$selectedOrderIndex]&gt;&gt; \
+&lt;&lt;set _selectedRider = $riders[$selectedRiderIndex]&gt;&gt; \
+&lt;&lt;silently&gt;&gt;
+  &lt;&lt;if _selectedOrder[&quot;rider&quot;] !== undefined and _selectedOrder[&quot;rider&quot;] !== null&gt;&gt;
+    &lt;&lt;set $orderByRiderName[_selectedOrder[&quot;rider&quot;][&quot;name&quot;]] = null&gt;&gt;
+  &lt;&lt;/if&gt;&gt;
+
+  &lt;&lt;set _oldOrder = $orderByRiderName[_selectedRider[&quot;name&quot;]]&gt;&gt;
+  &lt;&lt;if _oldOrder !== undefined and _oldOrder !== null&gt;&gt;
+    &lt;&lt;set _oldOrder[&quot;status&quot;] = &quot;waiting&quot;&gt;&gt;
+    &lt;&lt;set _oldOrder[&quot;rider&quot;] = null&gt;&gt;
+  &lt;&lt;/if&gt;&gt;
+
+  &lt;&lt;set _selectedOrder[&quot;rider&quot;] = _selectedRider&gt;&gt;
+  &lt;&lt;set $orderByRiderName[_selectedRider[&quot;name&quot;]] = _selectedOrder&gt;&gt;
+&lt;&lt;/silently&gt;&gt;
+Order has been assigned to &lt;&lt;print _selectedRider[&quot;name&quot;]&gt;&gt;
+[[Back to main view|Pizzeria main]]</tw-passagedata><tw-passagedata pid="21" name="Assignment failed" tags="" position="100,350" size="100,100">// Could not reassign due to collision with another assignment - mention assignment
 // back to select orders
 // back to wait</tw-passagedata><tw-passagedata pid="22" name="StoryInit" tags="" position="225,350" size="100,100">&lt;&lt;set $morale to 50&gt;&gt;
 &lt;&lt;set $money to 100&gt;&gt;
@@ -331,6 +380,7 @@ Order has been inserted in queue.
 &lt;&lt;run $riders.push({&quot;name&quot;: &quot;eS&quot;, &quot;capacity&quot;: 5, &quot;speed&quot;: 13})&gt;&gt;
 
 &lt;&lt;set $orders=[]&gt;&gt;
+&lt;&lt;set $orderByRiderName={}&gt;&gt;
 
 &lt;&lt;set $time_mins=480&gt;&gt;
 
