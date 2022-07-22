@@ -14,12 +14,13 @@ Let the work day begin!
   <<set $orders=[]>>
   [[Time to go home|Home room]]
 <<elseif $orders.length == 0 or $orders[0]["time"] >= $next_order_mins>> \
+  <<set $time_mins = $next_order_mins>> \
   <<set _start_min = $next_order_mins + 30>> \
   <<set _distance = either([2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 9])>> \
   <<set _pizza_count = either([1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8])>> \
-  <<set $candidate_order = {"distance": _distance, "pizzas": _pizza_count, "time": _start_min, "status": "unassigned", "rider": "-"}>> \
+  <<set $candidate_order = {"distance": _distance, "pizzas": _pizza_count, "time": _start_min, "status": "waiting", "rider": null}>> \
    
-  There is a new order for _pizza_count <<if _pizza_count == 1>>pizza<<else>>pizzas<</if>> at distance _distance and time _start_min.
+  There is a new order for _pizza_count <<if _pizza_count == 1>>pizza<<else>>pizzas<</if>> at distance _distance; order will be ready for rider pick up at <<print setup.minsToClock(_start_min)>>
   [[Accept order]]
   [[Refuse order|Pizzeria main]]
 <<else>>
@@ -35,7 +36,6 @@ Let the work day begin!
 
 :: Accept order
 <<silently>>
-  <<set $time_mins = $next_order_mins>>
   <<run $orders.push($candidate_order)>>
   <<run $orders.sort((a, b) => {return a["time"] - b["time"]})>>
 <</silently>>
@@ -46,22 +46,23 @@ Order has been inserted in queue.
 :: Show orders
 <<for _i, _order range $orders>> \
   <<silently>> \
-    <<set _mins_ref = _order["time"] % 60>>
-    <<set _hours_ref = Math.floor(_order["time"] / 60)>>
-    <<set _disp_hours = "" + _hours_ref>>
-    <<if _hours_ref < 10>>
-      <<set _disp_hours = "0" + _hours_ref>>
-    <</if>>
-    <<set _disp_mins = "" + _mins_ref>>
-    <<if _mins_ref < 10>>
-      <<set _disp_mins = "0" + _mins_ref>>
-    <</if>>
+    <<set _disp_time = setup.minsToClock(_order["time"])>>
   <</silently>> \
-  <<capture _order, _disp_hours, _disp_mins>> \
+  <<capture _order, _disp_time>> \
     Order for <<print _order["pizzas"]>> at distace <<print _order["distance"]>>
     ..status <<print _order["status"]>>
-    ..<<if _order["status"] == "unassigned">>ready at _disp_hours:_disp_mins<<else>>rider back at _disp_hours:_disp_mins<</if>>
-    <<if _order["rider"] != "-">>..rider <<print _order["rider"]>><</if>>
+    <<if _order["status"] == "waiting">> \
+      ..pizza ready at _disp_time
+    <<elseif _order["status"] == "idle">> \
+      ..pizza ready at _disp_time
+    <<elseif _order["status"] == "ongoing">>
+      ..rider back at _disp_time
+    <<elseif _order["status"] == "completed">>
+      ..delivery completed at _disp_time
+    <<else>>
+      ..delivery failed at _disp_time
+    <</if>> \
+    <<if _order["rider"] === null>>..no rider assigned<<else>>..rider <<print _order["rider"]>><</if>>
   <</capture>> \
 <</for>>
 

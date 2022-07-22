@@ -49,21 +49,21 @@ Monocycle Pizza
 
 <<set $time_mins=480>>
 
+<<script>>
+setup.minsToClock = function (minutes_count) {
+  var minutes = minutes_count % 60;
+  var hours = Math.floor(minutes_count / 60);
+
+  var disp_hours = (hours < 10 ? "0" + hours : "" + hours);
+  var disp_mins = (minutes < 10 ? "0" + minutes : "" + minutes);
+
+  return disp_hours + ":" + disp_mins;
+};
+<</script>>
+
 
 :: StoryCaption
-<<silently>>
-  <<set _mins_ref = $time_mins % 60>>
-  <<set _hours_ref = Math.floor($time_mins / 60)>>
-  <<set _disp_hours = "" + _hours_ref>>
-  <<if _hours_ref < 10>>
-    <<set _disp_hours = "0" + _hours_ref>>
-  <</if>>
-  <<set _disp_mins = "" + _mins_ref>>
-  <<if _mins_ref < 10>>
-    <<set _disp_mins = "0" + _mins_ref>>
-  <</if>>
-<</silently>>
-Time: _disp_hours:_disp_mins
+Time: <<print setup.minsToClock($time_mins)>>
 
 Money: $money
 Morale: $morale
