@@ -251,12 +251,13 @@ I guess that&#39;s another thing it lied about.
   &lt;&lt;set $orders=[]&gt;&gt;
   [[Time to go home|Home room]]
 &lt;&lt;elseif $orders.length == 0 or $orders[0][&quot;time&quot;] &gt;= $next_order_mins&gt;&gt; \
+  &lt;&lt;set $time_mins = $next_order_mins&gt;&gt; \
   &lt;&lt;set _start_min = $next_order_mins + 30&gt;&gt; \
   &lt;&lt;set _distance = either([2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 9])&gt;&gt; \
   &lt;&lt;set _pizza_count = either([1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8])&gt;&gt; \
-  &lt;&lt;set $candidate_order = {&quot;distance&quot;: _distance, &quot;pizzas&quot;: _pizza_count, &quot;time&quot;: _start_min, &quot;status&quot;: &quot;unassigned&quot;, &quot;rider&quot;: &quot;-&quot;}&gt;&gt; \
+  &lt;&lt;set $candidate_order = {&quot;distance&quot;: _distance, &quot;pizzas&quot;: _pizza_count, &quot;time&quot;: _start_min, &quot;status&quot;: &quot;waiting&quot;, &quot;rider&quot;: null}&gt;&gt; \
    
-  There is a new order for _pizza_count &lt;&lt;if _pizza_count == 1&gt;&gt;pizza&lt;&lt;else&gt;&gt;pizzas&lt;&lt;/if&gt;&gt; at distance _distance and time _start_min.
+  There is a new order for _pizza_count &lt;&lt;if _pizza_count == 1&gt;&gt;pizza&lt;&lt;else&gt;&gt;pizzas&lt;&lt;/if&gt;&gt; at distance _distance; order will be ready for rider pick up at &lt;&lt;print setup.minsToClock(_start_min)&gt;&gt;
   [[Accept order]]
   [[Refuse order|Pizzeria main]]
 &lt;&lt;else&gt;&gt;
@@ -268,29 +269,29 @@ I guess that&#39;s another thing it lied about.
   Order for &lt;&lt;print _order[&quot;pizzas&quot;]&gt;&gt; at distace &lt;&lt;print _order[&quot;distance&quot;]&gt;&gt; completed
   &lt;&lt;return&gt;&gt;
 &lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="16" name="Accept order" tags="" position="725,225" size="100,100">&lt;&lt;silently&gt;&gt;
-  &lt;&lt;set $time_mins = $next_order_mins&gt;&gt;
   &lt;&lt;run $orders.push($candidate_order)&gt;&gt;
   &lt;&lt;run $orders.sort((a, b) =&gt; {return a[&quot;time&quot;] - b[&quot;time&quot;]})&gt;&gt;
 &lt;&lt;/silently&gt;&gt;
 Order has been inserted in queue.
 [[Back|Pizzeria main]]</tw-passagedata><tw-passagedata pid="17" name="Show orders" tags="" position="850,225" size="100,100">&lt;&lt;for _i, _order range $orders&gt;&gt; \
   &lt;&lt;silently&gt;&gt; \
-    &lt;&lt;set _mins_ref = _order[&quot;time&quot;] % 60&gt;&gt;
-    &lt;&lt;set _hours_ref = Math.floor(_order[&quot;time&quot;] / 60)&gt;&gt;
-    &lt;&lt;set _disp_hours = &quot;&quot; + _hours_ref&gt;&gt;
-    &lt;&lt;if _hours_ref &lt; 10&gt;&gt;
-      &lt;&lt;set _disp_hours = &quot;0&quot; + _hours_ref&gt;&gt;
-    &lt;&lt;/if&gt;&gt;
-    &lt;&lt;set _disp_mins = &quot;&quot; + _mins_ref&gt;&gt;
-    &lt;&lt;if _mins_ref &lt; 10&gt;&gt;
-      &lt;&lt;set _disp_mins = &quot;0&quot; + _mins_ref&gt;&gt;
-    &lt;&lt;/if&gt;&gt;
+    &lt;&lt;set _disp_time = setup.minsToClock(_order[&quot;time&quot;])&gt;&gt;
   &lt;&lt;/silently&gt;&gt; \
-  &lt;&lt;capture _order, _disp_hours, _disp_mins&gt;&gt; \
+  &lt;&lt;capture _order, _disp_time&gt;&gt; \
     Order for &lt;&lt;print _order[&quot;pizzas&quot;]&gt;&gt; at distace &lt;&lt;print _order[&quot;distance&quot;]&gt;&gt;
     ..status &lt;&lt;print _order[&quot;status&quot;]&gt;&gt;
-    ..&lt;&lt;if _order[&quot;status&quot;] == &quot;unassigned&quot;&gt;&gt;ready at _disp_hours:_disp_mins&lt;&lt;else&gt;&gt;rider back at _disp_hours:_disp_mins&lt;&lt;/if&gt;&gt;
-    &lt;&lt;if _order[&quot;rider&quot;] != &quot;-&quot;&gt;&gt;..rider &lt;&lt;print _order[&quot;rider&quot;]&gt;&gt;&lt;&lt;/if&gt;&gt;
+    &lt;&lt;if _order[&quot;status&quot;] == &quot;waiting&quot;&gt;&gt; \
+      ..pizza ready at _disp_time
+    &lt;&lt;elseif _order[&quot;status&quot;] == &quot;idle&quot;&gt;&gt; \
+      ..pizza ready at _disp_time
+    &lt;&lt;elseif _order[&quot;status&quot;] == &quot;ongoing&quot;&gt;&gt;
+      ..rider back at _disp_time
+    &lt;&lt;elseif _order[&quot;status&quot;] == &quot;completed&quot;&gt;&gt;
+      ..delivery completed at _disp_time
+    &lt;&lt;else&gt;&gt;
+      ..delivery failed at _disp_time
+    &lt;&lt;/if&gt;&gt; \
+    &lt;&lt;if _order[&quot;rider&quot;] === null&gt;&gt;..no rider assigned&lt;&lt;else&gt;&gt;..rider &lt;&lt;print _order[&quot;rider&quot;]&gt;&gt;&lt;&lt;/if&gt;&gt;
   &lt;&lt;/capture&gt;&gt; \
 &lt;&lt;/for&gt;&gt;
 
@@ -331,19 +332,19 @@ Order has been inserted in queue.
 
 &lt;&lt;set $orders=[]&gt;&gt;
 
-&lt;&lt;set $time_mins=480&gt;&gt;</tw-passagedata><tw-passagedata pid="23" name="StoryCaption" tags="" position="350,350" size="100,100">&lt;&lt;silently&gt;&gt;
-  &lt;&lt;set _mins_ref = $time_mins % 60&gt;&gt;
-  &lt;&lt;set _hours_ref = Math.floor($time_mins / 60)&gt;&gt;
-  &lt;&lt;set _disp_hours = &quot;&quot; + _hours_ref&gt;&gt;
-  &lt;&lt;if _hours_ref &lt; 10&gt;&gt;
-    &lt;&lt;set _disp_hours = &quot;0&quot; + _hours_ref&gt;&gt;
-  &lt;&lt;/if&gt;&gt;
-  &lt;&lt;set _disp_mins = &quot;&quot; + _mins_ref&gt;&gt;
-  &lt;&lt;if _mins_ref &lt; 10&gt;&gt;
-    &lt;&lt;set _disp_mins = &quot;0&quot; + _mins_ref&gt;&gt;
-  &lt;&lt;/if&gt;&gt;
-&lt;&lt;/silently&gt;&gt;
-Time: _disp_hours:_disp_mins
+&lt;&lt;set $time_mins=480&gt;&gt;
+
+&lt;&lt;script&gt;&gt;
+setup.minsToClock = function (minutes_count) {
+  var minutes = minutes_count % 60;
+  var hours = Math.floor(minutes_count / 60);
+
+  var disp_hours = (hours &lt; 10 ? &quot;0&quot; + hours : &quot;&quot; + hours);
+  var disp_mins = (minutes &lt; 10 ? &quot;0&quot; + minutes : &quot;&quot; + minutes);
+
+  return disp_hours + &quot;:&quot; + disp_mins;
+};
+&lt;&lt;/script&gt;&gt;</tw-passagedata><tw-passagedata pid="23" name="StoryCaption" tags="" position="350,350" size="100,100">Time: &lt;&lt;print setup.minsToClock($time_mins)&gt;&gt;
 
 Money: $money
 Morale: $morale
