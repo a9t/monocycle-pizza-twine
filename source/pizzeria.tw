@@ -3,8 +3,11 @@ Let the work day begin!
 [[Assign order|Select rider]]
 [[Wait for event|Pizzeria event]]
 [[Show orders]]
-[[Give up|Home room]]
-
+<<if $money < 50>>
+  Shut it all down. [[It's not worth it|Game over]]
+<<else>>
+  [[Pack it up for the day|Home room][$money-=50]]
+<</if>>
 
 :: Pizzeria event
 <<set _mins_till_next_order = random(1, 30)>> \
@@ -15,7 +18,12 @@ Let the work day begin!
     <<set $orders=[]>> 
     <<set $orderByRiderName={}>>
   <</silently>>
-  [[Time to go home|Home room]]
+  <<if $money < 50 >>> \
+    You did not earn enough money to keep the pizzeria open.
+    Game over.
+  <<else>>
+    Work day is over. [[Time to go home|Home room][$money-=50]]
+  <</if>>
 <<elseif $orders.length == 0 or $orders[0]["time"] >= $next_order_mins>> \
   <<set $time_mins = $next_order_mins>> \
   <<set _start_min = $next_order_mins + 30>> \
@@ -29,10 +37,30 @@ Let the work day begin!
 <<else>>
   <<silently>> \
     /* remove it for now, this needs to be decided based on status */
-    <<set _order = $orders.shift()>>
+    <<set _order = $orders[0]>>
     <<set $time_mins = _order["time"]>>
   <</silently>> \
-  Order for <<print _order["pizzas"]>> at distace <<print _order["distance"]>> completed
+  <<if _order["status"] == "waiting">> \
+    <<run _order["status"] = "stale">> \
+    <<run _order["time"] += 10>> \
+    <<run $orders.sort((a, b) => {return a["time"] - b["time"]})>> \
+    Order for <<print _order["pizzas"]>> at distance <<print _order["distance"]>> turned stale; assign it in 10 minutes or less or else it fails
+  <<elseif _order["status"] == "idle">> \
+    <<run _order["status"] = "ongoing">> \
+    <<run _order["time"] = _order["time"] + Math.ceil(2 * (_order["distance"] + _order["rider"]["speed"]))>> \
+    <<run $orders.sort((a, b) => {return a["time"] - b["time"]})>> \
+    Order for <<print _order["pizzas"]>> at distance <<print _order["distance"]>> delivery in progress
+  <<elseif _order["status"] == "ongoing">> \
+    <<run _order["status"] = "completed">> \
+    <<run $money += _order["pizzas"] * 5>> \
+    <<run $orders.shift()>> \
+    Order for <<print _order["pizzas"]>> at distance <<print _order["distance"]>> completed
+  <<elseif _order["status"] == "stale">> \
+    <<run _order["status"] = "failed">> \
+    <<run $orders.shift()>> \
+    Order for <<print _order["pizzas"]>> at distance <<print _order["distance"]>> failed
+  <</if>>
+
   <<return>>
 <</if>>
 
@@ -58,11 +86,13 @@ Order has been inserted in queue.
       ..pizza ready at _disp_time
     <<elseif _order["status"] == "idle">> \
       ..pizza ready at _disp_time
-    <<elseif _order["status"] == "ongoing">>
+    <<elseif _order["status"] == "ongoing">> \
       ..rider back at _disp_time
-    <<elseif _order["status"] == "completed">>
+    <<elseif _order["status"] == "completed">> \
       ..delivery completed at _disp_time
-    <<else>>
+    <<elseif _order["status"] == "stale">> \
+      ..assign no later than _disp_time
+    <<else>> \
       ..delivery failed at _disp_time
     <</if>> \
     <<if _order["rider"] === null>>..no rider assigned<<else>>..rider <<print _order["rider"]["name"]>><</if>>
@@ -100,7 +130,7 @@ Order has been inserted in queue.
   <<capture _i, _order, _disp_time>> \
     <<if $orders[_i]["status"] == "waiting">> \
       [[Select|Assignment succeeded][$selectedOrderIndex=_i]] Order for <<print $orders[_i]["pizzas"]>> pizza(s) waiting till _disp_time
-    <<elseif order["status"] == "idle">> \
+    <<elseif $orders[_i]["status"] == "idle">> \
       [[Select|Assignment succeeded][$selectedOrderIndex=_i]] Order for <<print $orders[_i]["pizzas"]>> pizza(s) idle till _disp_time assigned to <<print $orders[_i]["rider"]["name"]>>
     <</if>> \
   <</capture>> \
@@ -124,6 +154,7 @@ Order has been inserted in queue.
   <</if>>
 
   <<set _selectedOrder["rider"] = _selectedRider>>
+  <<set _selectedOrder["status"] = "idle">>
   <<set $orderByRiderName[_selectedRider["name"]] = _selectedOrder>>
 <</silently>>
 Order has been assigned to <<print _selectedRider["name"]>>
