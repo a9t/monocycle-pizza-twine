@@ -100,8 +100,7 @@ var saveAs=saveAs||navigator.msSaveBlob&&navigator.msSaveBlob.bind(navigator)||f
 		<div id="init-lacking">Your browser lacks required capabilities. Please upgrade it or switch to another to continue.</div>
 		<div id="init-loading"><div>Loading&hellip;</div></div>
 	</div>
-	<!-- UUID://D674C58C-DEFA-4F70-B7A2-27742230CA2B// --><tw-storydata name="Monocycle Pizza" startnode="24" creator="Tweego" creator-version="2.1.1+81d1d71" ifid="D674C58C-DEFA-4F70-B7A2-27742230CA2B" zoom="1" format="SugarCube" format-version="2.30.0" options="" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style><script role="script" id="twine-user-script" type="text/twine-javascript"></script><tw-passagedata pid="1" name="Let&#39;s start" tags="" position="100,100" size="100,100">&lt;&lt;silently&gt;&gt;
-  &lt;&lt;set $dice_enhanced to false&gt;&gt;
+	<!-- UUID://D674C58C-DEFA-4F70-B7A2-27742230CA2B// --><tw-storydata name="Monocycle Pizza" startnode="28" creator="Tweego" creator-version="2.1.1+81d1d71" ifid="D674C58C-DEFA-4F70-B7A2-27742230CA2B" zoom="1" format="SugarCube" format-version="2.30.0" options="" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style><script role="script" id="twine-user-script" type="text/twine-javascript"></script><tw-passagedata pid="1" name="Let&#39;s start" tags="" position="100,100" size="100,100">&lt;&lt;silently&gt;&gt;
   &lt;&lt;set $rounds to $last_rounds&gt;&gt;
   &lt;&lt;run $challenge_count++&gt;&gt;
   &lt;&lt;run $last_rounds++&gt;&gt;
@@ -110,33 +109,7 @@ var saveAs=saveAs||navigator.msSaveBlob&&navigator.msSaveBlob.bind(navigator)||f
 You are on the street, about to have a confrontation.
 [[Let&#39;s start|Pre-encounter]]
 [[Nope|Home room]]</tw-passagedata><tw-passagedata pid="2" name="Pre-encounter" tags="" position="225,100" size="100,100">Encounter $challenge_count with a $crt_enemy will have &lt;&lt;print $rounds-1&gt;&gt; rounds
-[[Begin the challenge|Challenge]]
-&lt;&lt;if $morale &gt; $dice_enhancement_cost &amp;&amp; !$dice_enhanced&gt;&gt; \
-[[Improve your dice|Die choice]]
-&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="3" name="Die choice" tags="" position="350,100" size="100,100">The die enhancement will cost you $dice_enhancement_cost morale.
-[[I&#39;ve changed my mind; go to the challenge|Pre-encounter]]
-[[Improve first die|Die enhancement][$die_index=0]]
-[[Improve second die|Die enhancement][$die_index=1]]
-[[Improve third die|Die enhancement][$die_index=2]]
-[[Improve fourth die|Die enhancement][$die_index=3]]</tw-passagedata><tw-passagedata pid="4" name="Die enhancement" tags="" position="475,100" size="100,100">[[I&#39;ve changed my mind; go to the challenge|Pre-encounter]]
-
-&lt;&lt;for _j, _face range $dice_base_line[$die_index]&gt;&gt; \
-  &lt;&lt;capture _face&gt;&gt; \
-    &lt;&lt;if _face[1] === 0&gt;&gt; \
-      &lt;&lt;for _i, _value range [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;]&gt;&gt; \
-        &lt;&lt;capture _value&gt;&gt; \
-          &lt;&lt;set _msg to &quot;Set face &quot; + (_j + 1) + &quot; to 1&quot; + _value&gt;&gt; \
-          [[_msg|Pre-encounter][$dice_enhanced=true, _face[1]=1, _face[0]=_value, $morale-=$dice_enhancement_cost, $dice_enhancement_cost=$dice_enhancement_cost*2-2]]
-        &lt;&lt;/capture&gt;&gt; \
-      &lt;&lt;/for&gt;&gt; \
-    &lt;&lt;else&gt;&gt; \
-      &lt;&lt;if _face[1] != 3&gt;&gt; \
-        &lt;&lt;set _msg to &quot;Set face &quot; + (_j + 1) + &quot; to &quot; + (_face[1] + 1) + _face[0]&gt;&gt; \
-        [[_msg|Pre-encounter][$dice_enhanced=true, _face[1]+=1, $morale-=$dice_enhancement_cost, $dice_enhancement_cost=$dice_enhancement_cost*2-2]]
-      &lt;&lt;/if&gt;&gt; \
-    &lt;&lt;/if&gt;&gt; \
-  &lt;&lt;/capture&gt;&gt; \
-&lt;&lt;/for&gt;&gt; \</tw-passagedata><tw-passagedata pid="5" name="Challenge" tags="" position="600,100" size="100,100">&lt;&lt;run $rounds--&gt;&gt;
+[[Begin the challenge|Challenge]]</tw-passagedata><tw-passagedata pid="3" name="Challenge" tags="" position="350,100" size="100,100">&lt;&lt;run $rounds--&gt;&gt;
 &lt;&lt;if $rounds == 0&gt;&gt;
   &lt;&lt;silently&gt;&gt;
     &lt;&lt;set $morale+=5&gt;&gt;
@@ -144,7 +117,7 @@ You are on the street, about to have a confrontation.
       &lt;&lt;set $morale = 100&gt;&gt;
     &lt;&lt;/if&gt;&gt;
   &lt;&lt;/silently&gt;&gt;
-  Challenge is over. [[Continue your trip|Let&#39;s start]]
+  Challenge is over. [[Go back home|Home after challenge]]
 &lt;&lt;else&gt;&gt;
   &lt;&lt;silently&gt;&gt;
     &lt;&lt;set _tartget_type = either($enemy[$crt_enemy][&quot;bias&quot;])&gt;&gt;
@@ -198,49 +171,92 @@ You are on the street, about to have a confrontation.
           &lt;&lt;/if&gt;&gt; \
         &lt;&lt;/for&gt;&gt; \
         Your new roll is: _msg
+        &lt;&lt;if _acc &gt;= _target_count &gt;&gt;
+          You win the round; &lt;&lt;run $morale++&gt;&gt;&lt;&lt;if $morale &gt; 100&gt;&gt;&lt;&lt;set $morale = 100&gt;&gt;&lt;&lt;/if&gt;&gt;[[next round|Challenge]]
+        &lt;&lt;else&gt;&gt;
+          You lose the round; &lt;&lt;run $morale-=2&gt;&gt;&lt;&lt;if $morale &gt; 0&gt;&gt;[[next round|Challenge]]&lt;&lt;else&gt;&gt;[[You can no longer fight|End game]]&lt;&lt;/if&gt;&gt;
+        &lt;&lt;/if&gt;&gt;
       &lt;&lt;/linkappend&gt;&gt; \
-      &lt;&lt;if _acc &gt;= _target_count &gt;&gt;
-        You win the round; &lt;&lt;run $morale++&gt;&gt;&lt;&lt;if $morale &gt; 100&gt;&gt;&lt;&lt;set $morale = 100&gt;&gt;&lt;&lt;/if&gt;&gt;[[next round|Challenge]]
-      &lt;&lt;else&gt;&gt;
-        You lose the round; &lt;&lt;run $morale-=2&gt;&gt;&lt;&lt;if $morale &gt; 0&gt;&gt;[[next round|Challenge]]&lt;&lt;else&gt;&gt;[[You can no longer fight|End game]]&lt;&lt;/if&gt;&gt;
-      &lt;&lt;/if&gt;&gt;
     &lt;&lt;/if&gt;&gt;
   &lt;&lt;/linkappend&gt;&gt;
-&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="6" name="End game" tags="" position="725,100" size="100,100">Game Over</tw-passagedata><tw-passagedata pid="7" name="Home room" tags="" position="850,100" size="100,100">Back home...
-[[Browse the internet]]
-[[Watch TV]]
-[[Go to pizzeria|Pizzeria main][$time_mins=480]]
-[[Go out|Let&#39;s start]]</tw-passagedata><tw-passagedata pid="8" name="Browse the internet" tags="" position="975,100" size="100,100">There is so much here. I don&#39;t know where to start.
-[[Home room]]</tw-passagedata><tw-passagedata pid="9" name="Watch TV" tags="" position="1100,100" size="100,100">&lt;&lt;if $tv_working&gt;&gt; \
+&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="4" name="End game" tags="" position="475,100" size="100,100">Game Over</tw-passagedata><tw-passagedata pid="5" name="Home room" tags="" position="600,100" size="100,100">&lt;&lt;silently&gt;&gt;
+  &lt;&lt;set $dailyActivity = true&gt;&gt;
+&lt;&lt;/silently&gt;&gt;
+Back home...
+[[What should I do?|Home activities]]</tw-passagedata><tw-passagedata pid="6" name="Home after challenge" tags="" position="725,100" size="100,100">That was... interesting...
+[[Go to bed|Sleep]]</tw-passagedata><tw-passagedata pid="7" name="Home activities" tags="" position="850,100" size="100,100">&lt;&lt;if $dailyActivity&gt;&gt;
+  [[Browse the internet][$dailyActivity=false]]
+  [[Watch TV][$dailyActivity=false]]
+  [[Relax][$dailyActivity=false]]
+  [[Go out|Let&#39;s start][$dailyActivity=false]]
+&lt;&lt;/if&gt;&gt;
+[[Go to bed|Sleep]]</tw-passagedata><tw-passagedata pid="8" name="Sleep" tags="" position="975,100" size="100,100">You lie in bed thinking of the day&#39;s events.
+You are tired and sleep takes you eventually.
+[[Continue|Morning]]</tw-passagedata><tw-passagedata pid="9" name="Morning" tags="" position="1100,100" size="100,100">&lt;&lt;silently&gt;&gt;
+  &lt;&lt;set $time_mins = 480&gt;&gt;
+&lt;&lt;/silently&gt;&gt;
+Good morning! You feel reinvigorated.
+Time to [[go to the pizzeria!|Pizzeria main]]</tw-passagedata><tw-passagedata pid="10" name="Browse the internet" tags="" position="1225,100" size="100,100">There is so much here. Interesting things, but also lots of misery.
+&lt;&lt;if $morale &gt; $dice_enhancement_cost&gt;&gt; \
+  [[I must work through it to better myself|Die choice]]
+  [[Maybe now is not the time|Home activities][$dailyActivity=true]]
+&lt;&lt;else&gt;&gt; \
+  I don&#39;t know if I can take it.
+  [[Home activities][$dailyActivity=true]]
+&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="11" name="Die choice" tags="" position="100,225" size="100,100">The die enhancement will cost you $dice_enhancement_cost morale.
+[[I need to think more about this|Browse the internet]]
+[[Improve first die|Die enhancement][$die_index=0]]
+[[Improve second die|Die enhancement][$die_index=1]]
+[[Improve third die|Die enhancement][$die_index=2]]
+[[Improve fourth die|Die enhancement][$die_index=3]]</tw-passagedata><tw-passagedata pid="12" name="Die enhancement" tags="" position="225,225" size="100,100">[[I need to think more about this|Die choice]]
+
+&lt;&lt;for _j, _face range $dice_base_line[$die_index]&gt;&gt; \
+  &lt;&lt;capture _face&gt;&gt; \
+    &lt;&lt;if _face[1] === 0&gt;&gt; \
+      &lt;&lt;for _i, _value range [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;]&gt;&gt; \
+        &lt;&lt;capture _value&gt;&gt; \
+          &lt;&lt;set _msg to &quot;Set face &quot; + (_j + 1) + &quot; to 1&quot; + _value&gt;&gt; \
+          [[_msg|Home activities][$dice_enhanced=true, _face[1]=1, _face[0]=_value, $morale-=$dice_enhancement_cost, $dice_enhancement_cost=$dice_enhancement_cost*2-2]]
+        &lt;&lt;/capture&gt;&gt; \
+      &lt;&lt;/for&gt;&gt; \
+    &lt;&lt;else&gt;&gt; \
+      &lt;&lt;if _face[1] != 3&gt;&gt; \
+        &lt;&lt;set _msg to &quot;Set face &quot; + (_j + 1) + &quot; to &quot; + (_face[1] + 1) + _face[0]&gt;&gt; \
+        [[_msg|Home activities][$dice_enhanced=true, _face[1]+=1, $morale-=$dice_enhancement_cost, $dice_enhancement_cost=$dice_enhancement_cost*2-2]]
+      &lt;&lt;/if&gt;&gt; \
+    &lt;&lt;/if&gt;&gt; \
+  &lt;&lt;/capture&gt;&gt; \
+&lt;&lt;/for&gt;&gt; \</tw-passagedata><tw-passagedata pid="13" name="Relax" tags="" position="350,225" size="100,100">Spend some quality time doing what you enjoy.
+[[Home activities][$morale+=5]]</tw-passagedata><tw-passagedata pid="14" name="Watch TV" tags="" position="475,225" size="100,100">&lt;&lt;if $tv_working&gt;&gt; \
   This thing is depressing, but maybe there is something here. [[I need to keep watching.|Watch TV - part 2]]
-  [[Turn off TV|Home room]]
+  [[Turn off TV|Home activities]]
 &lt;&lt;else&gt;&gt; \
   Strange that this TV I broke is still broken.
-  [[I should do something else|Home room]]
-&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="10" name="Watch TV - part 2" tags="" position="1225,100" size="100,100">&lt;&lt;set $morale-=2&gt;&gt; \
+  [[I should do something else|Home activities][$dailyActivity=false]]
+&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="15" name="Watch TV - part 2" tags="" position="600,225" size="100,100">&lt;&lt;set $morale-=2&gt;&gt; \
 &lt;&lt;if $morale &lt;= 0&gt;&gt;&gt; \
   TV really is bad for you.
   Game Over.
 &lt;&lt;else&gt;&gt;
   Maybe the worst part of this is over. [[I should continue.|Watch TV - part 3]]
-  [[OK, that&#39;s enough|Home room]]
-&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="11" name="Watch TV - part 3" tags="" position="100,225" size="100,100">&lt;&lt;set $morale-=3&gt;&gt; \
+  [[OK, that&#39;s enough|Home activities]]
+&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="16" name="Watch TV - part 3" tags="" position="725,225" size="100,100">&lt;&lt;set $morale-=3&gt;&gt; \
 &lt;&lt;if $morale &lt;= 0&gt;&gt;&gt; \
   You should have stopped a few hours ago. Now it&#39;s too late.
   Game Over.
 &lt;&lt;else&gt;&gt;
   I feel physically ill. [[But I have to keep watching.|Watch TV - part 4]]
-  [[Need to stop or I&#39;ll throw up|Home room]]
+  [[Need to stop or I&#39;ll throw up|Home activities]]
   [[Smash this venom spewing machine|Smashed TV][$tv_working=false]]
-&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="12" name="Watch TV - part 4" tags="" position="225,225" size="100,100">&lt;&lt;set $morale-=5&gt;&gt; \
+&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="17" name="Watch TV - part 4" tags="" position="850,225" size="100,100">&lt;&lt;set $morale-=5&gt;&gt; \
 &lt;&lt;if $morale &lt;= 0&gt;&gt;&gt; \
   You ingested so much garbage that you destroyed yourself.
   Game Over.
 &lt;&lt;else&gt;&gt;
-  When did I fall asleep? [[No more TV for me|Home room]]
-&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="13" name="Smashed TV" tags="" position="350,225" size="100,100">The TV told me that when it dies there&#39;s smoke coming out of it.
+  When did I fall asleep? [[No more TV for me|Home activities]]
+&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="18" name="Smashed TV" tags="" position="975,225" size="100,100">The TV told me that when it dies there&#39;s smoke coming out of it.
 I guess that&#39;s another thing it lied about.
-[[Home room]]</tw-passagedata><tw-passagedata pid="14" name="Pizzeria main" tags="" position="475,225" size="100,100">Let the work day begin!
+[[Home activities]]</tw-passagedata><tw-passagedata pid="19" name="Pizzeria main" tags="" position="1100,225" size="100,100">Let the work day begin!
 [[Assign order|Select rider]]
 [[Wait for event|Pizzeria event]]
 [[Show orders]]
@@ -248,7 +264,7 @@ I guess that&#39;s another thing it lied about.
   Shut it all down. [[It&#39;s not worth it|Game over]]
 &lt;&lt;else&gt;&gt;
   [[Pack it up for the day|Home room][$money-=50]]
-&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="15" name="Pizzeria event" tags="" position="600,225" size="100,100">&lt;&lt;set _mins_till_next_order = random(1, 30)&gt;&gt; \
+&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="20" name="Pizzeria event" tags="" position="1225,225" size="100,100">&lt;&lt;set _mins_till_next_order = random(1, 30)&gt;&gt; \
 &lt;&lt;set $next_order_mins = $time_mins + _mins_till_next_order&gt;&gt; \
 
 &lt;&lt;if $time_mins/60 &gt;= 16&gt;&gt;
@@ -290,6 +306,8 @@ I guess that&#39;s another thing it lied about.
     Order for &lt;&lt;print _order[&quot;pizzas&quot;]&gt;&gt; at distance &lt;&lt;print _order[&quot;distance&quot;]&gt;&gt; delivery in progress
   &lt;&lt;elseif _order[&quot;status&quot;] == &quot;ongoing&quot;&gt;&gt; \
     &lt;&lt;run _order[&quot;status&quot;] = &quot;completed&quot;&gt;&gt; \
+    &lt;&lt;run _rider = _order[&quot;rider&quot;]&gt;&gt; \
+    &lt;&lt;run $orderByRiderName[_rider[&quot;name&quot;]] = null&gt;&gt; \
     &lt;&lt;run $money += _order[&quot;pizzas&quot;] * 5&gt;&gt; \
     &lt;&lt;run $orders.shift()&gt;&gt; \
     Order for &lt;&lt;print _order[&quot;pizzas&quot;]&gt;&gt; at distance &lt;&lt;print _order[&quot;distance&quot;]&gt;&gt; completed
@@ -300,12 +318,12 @@ I guess that&#39;s another thing it lied about.
   &lt;&lt;/if&gt;&gt;
 
   &lt;&lt;return&gt;&gt;
-&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="16" name="Accept order" tags="" position="725,225" size="100,100">&lt;&lt;silently&gt;&gt;
+&lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="21" name="Accept order" tags="" position="100,350" size="100,100">&lt;&lt;silently&gt;&gt;
   &lt;&lt;run $orders.push($candidate_order)&gt;&gt;
   &lt;&lt;run $orders.sort((a, b) =&gt; {return a[&quot;time&quot;] - b[&quot;time&quot;]})&gt;&gt;
 &lt;&lt;/silently&gt;&gt;
 Order has been inserted in queue.
-[[Back|Pizzeria main]]</tw-passagedata><tw-passagedata pid="17" name="Show orders" tags="" position="850,225" size="100,100">&lt;&lt;for _i, _order range $orders&gt;&gt; \
+[[Back|Pizzeria main]]</tw-passagedata><tw-passagedata pid="22" name="Show orders" tags="" position="225,350" size="100,100">&lt;&lt;for _i, _order range $orders&gt;&gt; \
   &lt;&lt;silently&gt;&gt; \
     &lt;&lt;set _disp_time = setup.minsToClock(_order[&quot;time&quot;])&gt;&gt;
   &lt;&lt;/silently&gt;&gt; \
@@ -329,7 +347,7 @@ Order has been inserted in queue.
   &lt;&lt;/capture&gt;&gt; \
 &lt;&lt;/for&gt;&gt;
 
-&lt;&lt;return&gt;&gt;</tw-passagedata><tw-passagedata pid="18" name="Select rider" tags="" position="975,225" size="100,100">&lt;&lt;for _i, _rider range $riders&gt;&gt; \
+&lt;&lt;return&gt;&gt;</tw-passagedata><tw-passagedata pid="23" name="Select rider" tags="" position="350,350" size="100,100">&lt;&lt;for _i, _rider range $riders&gt;&gt; \
   &lt;&lt;set _riderName = _rider[&quot;name&quot;]&gt;&gt; \
   &lt;&lt;set _order = $orderByRiderName[_rider[&quot;name&quot;]]&gt;&gt; \
   &lt;&lt;set _message = &quot;Assign rider &quot; + _riderName&gt;&gt; \
@@ -340,7 +358,7 @@ Order has been inserted in queue.
   &lt;&lt;/capture&gt;&gt; \
 &lt;&lt;/for&gt;&gt;\
 
-[[Back|Pizzeria main]]</tw-passagedata><tw-passagedata pid="19" name="Select order" tags="" position="1100,225" size="100,100">&lt;&lt;set _selectedRider = $riders[$selectedRiderIndex]&gt;&gt; \
+[[Back|Pizzeria main]]</tw-passagedata><tw-passagedata pid="24" name="Select order" tags="" position="475,350" size="100,100">&lt;&lt;set _selectedRider = $riders[$selectedRiderIndex]&gt;&gt; \
 &lt;&lt;print &quot;Assign rider &quot; + _selectedRider[&quot;name&quot;]&gt;&gt;
 &lt;&lt;for _i, _order range $orders&gt;&gt; \
   &lt;&lt;silently&gt;&gt; \
@@ -358,7 +376,7 @@ Order has been inserted in queue.
   &lt;&lt;/capture&gt;&gt; \
 &lt;&lt;/for&gt;&gt;
 
-[[Back to riders|Select rider]]</tw-passagedata><tw-passagedata pid="20" name="Assignment succeeded" tags="" position="1225,225" size="100,100">&lt;&lt;set _selectedOrder = $orders[$selectedOrderIndex]&gt;&gt; \
+[[Back to riders|Select rider]]</tw-passagedata><tw-passagedata pid="25" name="Assignment succeeded" tags="" position="600,350" size="100,100">&lt;&lt;set _selectedOrder = $orders[$selectedOrderIndex]&gt;&gt; \
 &lt;&lt;set _selectedRider = $riders[$selectedRiderIndex]&gt;&gt; \
 &lt;&lt;silently&gt;&gt;
   &lt;&lt;if _selectedOrder[&quot;rider&quot;] !== undefined and _selectedOrder[&quot;rider&quot;] !== null&gt;&gt;
@@ -376,9 +394,7 @@ Order has been inserted in queue.
   &lt;&lt;set $orderByRiderName[_selectedRider[&quot;name&quot;]] = _selectedOrder&gt;&gt;
 &lt;&lt;/silently&gt;&gt;
 Order has been assigned to &lt;&lt;print _selectedRider[&quot;name&quot;]&gt;&gt;
-[[Back to main view|Pizzeria main]]</tw-passagedata><tw-passagedata pid="21" name="Assignment failed" tags="" position="100,350" size="100,100">// Could not reassign due to collision with another assignment - mention assignment
-// back to select orders
-// back to wait</tw-passagedata><tw-passagedata pid="22" name="StoryInit" tags="" position="225,350" size="100,100">&lt;&lt;set $morale to 50&gt;&gt;
+[[Back to main view|Pizzeria main]]</tw-passagedata><tw-passagedata pid="26" name="StoryInit" tags="" position="725,350" size="100,100">&lt;&lt;set $morale to 50&gt;&gt;
 &lt;&lt;set $money to 100&gt;&gt;
 
 &lt;&lt;set $dice_base_line = []&gt;&gt;
@@ -426,7 +442,7 @@ setup.minsToClock = function (minutes_count) {
 
   return disp_hours + &quot;:&quot; + disp_mins;
 };
-&lt;&lt;/script&gt;&gt;</tw-passagedata><tw-passagedata pid="23" name="StoryCaption" tags="" position="350,350" size="100,100">Time: &lt;&lt;print setup.minsToClock($time_mins)&gt;&gt;
+&lt;&lt;/script&gt;&gt;</tw-passagedata><tw-passagedata pid="27" name="StoryCaption" tags="" position="850,350" size="100,100">Time: &lt;&lt;print setup.minsToClock($time_mins)&gt;&gt;
 
 Money: $money
 Morale: $morale
@@ -447,8 +463,8 @@ Morale: $morale
 Riders
 &lt;&lt;for _i, _rider range $riders&gt;&gt;
     _rider[&quot;name&quot;]: carry - _rider[&quot;capacity&quot;], speed - _rider[&quot;speed&quot;]
-&lt;&lt;/for&gt;&gt;</tw-passagedata><tw-passagedata pid="24" name="Start" tags="" position="475,350" size="100,100">Welcome to Monocycle Pizza!
-[[Investigate your room|Home room]].</tw-passagedata><tw-passagedata pid="25" name="Game over" tags="" position="600,350" size="100,100">You failed.
+&lt;&lt;/for&gt;&gt;</tw-passagedata><tw-passagedata pid="28" name="Start" tags="" position="975,350" size="100,100">Welcome to Monocycle Pizza!
+[[Investigate your room|Morning]].</tw-passagedata><tw-passagedata pid="29" name="Game over" tags="" position="1100,350" size="100,100">You failed.
 Game over.</tw-passagedata></tw-storydata>
 	<script id="script-sugarcube" type="text/javascript">
 	/*! SugarCube JS */
