@@ -52,6 +52,8 @@ Let the work day begin!
     Order for <<print _order["pizzas"]>> at distance <<print _order["distance"]>> delivery in progress
   <<elseif _order["status"] == "ongoing">> \
     <<run _order["status"] = "completed">> \
+    <<run _rider = _order["rider"]>> \
+    <<run $orderByRiderName[_rider["name"]] = null>> \
     <<run $money += _order["pizzas"] * 5>> \
     <<run $orders.shift()>> \
     Order for <<print _order["pizzas"]>> at distance <<print _order["distance"]>> completed
@@ -159,10 +161,3 @@ Order has been inserted in queue.
 <</silently>>
 Order has been assigned to <<print _selectedRider["name"]>>
 [[Back to main view|Pizzeria main]]
-
-
-
-:: Assignment failed
-// Could not reassign due to collision with another assignment - mention assignment
-// back to select orders
-// back to wait

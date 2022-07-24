@@ -1,23 +1,94 @@
 :: Home room
+<<silently>>
+  <<set $dailyActivity = true>>
+<</silently>>
 Back home...
-[[Browse the internet]]
-[[Watch TV]]
-[[Go to pizzeria|Pizzeria main][$time_mins=480]]
-[[Go out|Let's start]]
+[[What should I do?|Home activities]]
+
+
+:: Home after challenge
+That was... interesting...
+[[Go to bed|Sleep]]
+
+
+:: Home activities
+<<if $dailyActivity>>
+  [[Browse the internet][$dailyActivity=false]]
+  [[Watch TV][$dailyActivity=false]]
+  [[Relax][$dailyActivity=false]]
+  [[Go out|Let's start][$dailyActivity=false]]
+<</if>>
+[[Go to bed|Sleep]]
+
+
+:: Sleep
+You lie in bed thinking of the day's events.
+You are tired and sleep takes you eventually.
+[[Continue|Morning]]
+
+
+:: Morning
+<<silently>>
+  <<set $time_mins = 480>>
+<</silently>>
+Good morning! You feel reinvigorated.
+Time to [[go to the pizzeria!|Pizzeria main]]
 
 
 :: Browse the internet
-There is so much here. I don't know where to start.
-[[Home room]]
+There is so much here. Interesting things, but also lots of misery.
+<<if $morale > $dice_enhancement_cost>> \
+  [[I must work through it to better myself|Die choice]]
+  [[Maybe now is not the time|Home activities][$dailyActivity=true]]
+<<else>> \
+  I don't know if I can take it.
+  [[Home activities][$dailyActivity=true]]
+<</if>>
+
+
+:: Die choice
+The die enhancement will cost you $dice_enhancement_cost morale.
+[[I need to think more about this|Browse the internet]]
+[[Improve first die|Die enhancement][$die_index=0]]
+[[Improve second die|Die enhancement][$die_index=1]]
+[[Improve third die|Die enhancement][$die_index=2]]
+[[Improve fourth die|Die enhancement][$die_index=3]]
+
+
+:: Die enhancement
+[[I need to think more about this|Die choice]]
+
+<<for _j, _face range $dice_base_line[$die_index]>> \
+  <<capture _face>> \
+    <<if _face[1] === 0>> \
+      <<for _i, _value range ["A", "B", "C", "D"]>> \
+        <<capture _value>> \
+          <<set _msg to "Set face " + (_j + 1) + " to 1" + _value>> \
+          [[_msg|Home activities][$dice_enhanced=true, _face[1]=1, _face[0]=_value, $morale-=$dice_enhancement_cost, $dice_enhancement_cost=$dice_enhancement_cost*2-2]]
+        <</capture>> \
+      <</for>> \
+    <<else>> \
+      <<if _face[1] != 3>> \
+        <<set _msg to "Set face " + (_j + 1) + " to " + (_face[1] + 1) + _face[0]>> \
+        [[_msg|Home activities][$dice_enhanced=true, _face[1]+=1, $morale-=$dice_enhancement_cost, $dice_enhancement_cost=$dice_enhancement_cost*2-2]]
+      <</if>> \
+    <</if>> \
+  <</capture>> \
+<</for>> \
+
+
+:: Relax
+Spend some quality time doing what you enjoy.
+[[Home activities][$morale+=5]]
 
 
 :: Watch TV
 <<if $tv_working>> \
   This thing is depressing, but maybe there is something here. [[I need to keep watching.|Watch TV - part 2]]
-  [[Turn off TV|Home room]]
+  [[Turn off TV|Home activities]]
 <<else>> \
   Strange that this TV I broke is still broken.
-  [[I should do something else|Home room]]
+  [[I should do something else|Home activities][$dailyActivity=false]]
 <</if>>
 
 
@@ -28,7 +99,7 @@ There is so much here. I don't know where to start.
   Game Over.
 <<else>>
   Maybe the worst part of this is over. [[I should continue.|Watch TV - part 3]]
-  [[OK, that's enough|Home room]]
+  [[OK, that's enough|Home activities]]
 <</if>>
 
 
@@ -39,7 +110,7 @@ There is so much here. I don't know where to start.
   Game Over.
 <<else>>
   I feel physically ill. [[But I have to keep watching.|Watch TV - part 4]]
-  [[Need to stop or I'll throw up|Home room]]
+  [[Need to stop or I'll throw up|Home activities]]
   [[Smash this venom spewing machine|Smashed TV][$tv_working=false]]
 <</if>>
 
@@ -50,11 +121,11 @@ There is so much here. I don't know where to start.
   You ingested so much garbage that you destroyed yourself.
   Game Over.
 <<else>>
-  When did I fall asleep? [[No more TV for me|Home room]]
+  When did I fall asleep? [[No more TV for me|Home activities]]
 <</if>>
 
 
 :: Smashed TV
 The TV told me that when it dies there's smoke coming out of it.
 I guess that's another thing it lied about.
-[[Home room]]
+[[Home activities]]
